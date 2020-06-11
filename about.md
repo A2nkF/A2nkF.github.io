@@ -15,4 +15,4 @@ This blog is a documentation of some of my more interesting projects. Feel free 
 
 [Twitter](twitter.com/a2nkf_)
 
-Email: `"A2nkF@notADomain.xyz".replace('notADomain.xyz','protonmail.com`
+Email: `"A2nkF@notADomain.xyz".replace('notADomain.xyz','protonmail.com')`
