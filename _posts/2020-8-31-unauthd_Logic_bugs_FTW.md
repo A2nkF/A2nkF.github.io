@@ -101,6 +101,7 @@ As we can see, it looks for the `com.apple.private.AuthorizationServices` entitl
 With this knowledge, triggering the bug is very straight forward:
 
 1. Create an entitlement file with the right(s) you want (we'll use `system.install.apple-software` for the sake of demonstation) e.g.: 
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
