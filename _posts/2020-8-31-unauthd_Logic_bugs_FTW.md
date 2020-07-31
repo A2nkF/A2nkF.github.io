@@ -163,6 +163,7 @@ I'm sure that I've missed some other way to use the rights to get code execution
 
 Apple's mitigation for this bug was implementing the code validity checks in `SecCodeCopySigningInformation`, thereby removing the need to call `SecCodeCheckValidity[WithErrors]` beforehand.
 The updated developer documentation states:
+
 ```
 This function obtains and verifies the signature on the code specified by the code object. 
 It checks the validity of all sealed components, including resources (if any). It validates the code against 
@@ -199,6 +200,7 @@ In theory, this could be fine, if kextutil would open the kext just once, loadin
 But as I mentioned in the introduction, this chain is 100% reliable and most race conditions have some chance of you loosing the race. This is where we can use a trick to ensure that we always win the race: `kextutil` has an `-interactive` flag. Specifying this flag will stop `kextutil` at each of the previously discussed steps, allowing us to win the "race" 100% of the time. 
 
 So this is what we need to do after bypassing SIP: 
+
 1. Copy some Apple signed kernel extension (e.g.`acfs.kext`) to a non-SIP protected location (e.g. `/tmp`)
 2. Run `kextutil -interactive /tmp/acfs.kext` (`kextutil` will automatically verify the signature but wait for your interaction before loading the kext)
 3. Overwrite the binary with your own (e.g. `mv kernelHax /Library/StagedExtensions/private/tmp/acfs.kext/Contents/MacOS/acfs`)
