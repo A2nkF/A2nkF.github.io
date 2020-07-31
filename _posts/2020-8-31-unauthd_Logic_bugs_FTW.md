@@ -21,11 +21,12 @@ There are [some facilities](https://developer.apple.com/documentation/security/a
 
 The following graphic tries to illustrate the functionality provided by `authd`.
 
-![_config.yml]({{ site.baseurl }}/images/2020-8-31-unauthd_Logic_bugs_FTW/process_authd.png)
+
+![_config.yml]({{ site.baseurl }}/images/unauthd_Logic_bugs_FTW/process_authd.png)
 
 The set of supported rules as well as some preregistered rights are defined in the [authorization.plist](https://opensource.apple.com/source/Security/Security-59306.11.20/OSX/authd/authorization.plist.auto.html). The rules allow for very granular control over what privilege a client needs to have in order to qualify for a rule. They include but are not limited to the client's group, the client's user, whether it's running as GUI or console and the client's entitlements. Some rights additionally or alternatively require the user to enter their password into a pop-up dialog. If you're a MacOS user I'm sure you've seen similar pop-ups before ;)
 
-![_config.yml]({{ site.baseurl }}/images/2020-8-31-unauthd_Logic_bugs_FTW/authd_popup.png)
+![_config.yml]({{ site.baseurl }}/images/unauthd_Logic_bugs_FTW/authd_popup.png)
 
 While auditing the `authd` code I found something interesting in [process.c](https://opensource.apple.com/source/Security/Security-59306.11.20/OSX/authd/process.c.auto.html).
 Specifically the part responsible for fetching code signing related information from a client: 
@@ -117,7 +118,7 @@ With this knowledge, triggering the bug is very straight forward:
 3. While the program is waiting, run `codesign -f -s - --entitlements entitlements.xml ./test` where `./test` is the path to your program
 4. Observe the `authd` logs. You'll find something similar to this:
 
-![_config.yml]({{ site.baseurl }}/images/2020-8-31-unauthd_Logic_bugs_FTW/log_authd.png)
+![_config.yml]({{ site.baseurl }}/images/unauthd_Logic_bugs_FTW/log_authd.png)
 
 In case you're wondering why we can't just do the codesigning first, before even running the program, it's because of the AppleMobileFileIntegretyDaemon or `amfid(8)`. This is the daemon responsible for fetching and verifying entitlements/signatures of signed binaries. `amfid` wouldn't allow us to run since we're a non Apple signed program with restricted entitlements.
 
@@ -180,7 +181,7 @@ signed... So, what if we found an Apple signed package, where we can somehow hij
 
 So where can we get Apple signed packages? There are quite a few at [Apple's developer website](https://developer.apple.com/download/more/), but after downloading all of them and reading through most of the scripts I didn't manage to find anything... Since this wasn't successful I looked for alternative downloads and finally found one: [`macOSPublicBetaAccessUtility.pkg`](https://beta.apple.com/sp/downloads/projects/1001260/downloads/1012439) downloadable at beta.apple.com. Let's have a look at this postinstall script, `$3` holds the disk, this package is being installed onto:  
 
-![_config.yml]({{ site.baseurl }}/images/2020-8-31-unauthd_Logic_bugs_FTW/systeminstalld_script.png)
+![_config.yml]({{ site.baseurl }}/images/unauthd_Logic_bugs_FTW/systeminstalld_script.png)
 
 So here we are, being able to forge an executable with elevated rights as long as the path matches. Uhm, I don't know why anyone would ever do something like this but whatever, we have our root code execution and a SIP bypass for good measure. 
 Now, we still want kernel code execution, so on to the next vulnerability :P
