@@ -8,7 +8,7 @@ title: Unauthd - Logic bugs FTW
 Hi! I'm Ilias aka A2nkF, an independent security researcher from Germany.
 
 This blog post is about a MacOS LPE chain I wrote and reported back in Februray. It features three logic bugs to go from user to root with System Integrety Protection (SIP) bypass to kernel. Since I'm not exploiting any memory corruptions or other vulnerabilites that aren't 100% deterministic, this chain is fully reliable which I think is cool ;). It runs on MacOS <= 10.15.5
-This was my first real life exploit chain so I probably made a ton of mistakes. If you spot any or have have any suggestions/improvments, please DM me on [twitter](https://twitter.com/A2nkF_) or create a pull request/issue. 
+This was my first real life exploit chain so I probably made a ton of mistakes. If you spot any or have any suggestions/improvments, please DM me on [twitter](https://twitter.com/A2nkF_) or create a pull request/issue. 
 
 
 ## Vulnerability 1
@@ -24,12 +24,12 @@ The following graphic tries to illustrate the functionality provided by `authd`.
 
 ![_config.yml]({{ site.baseurl }}/images/unauthd_Logic_bugs_FTW/process_authd.png)
 
-The set of supported rules as well as some preregistered rights are defined in the [authorization.plist](https://opensource.apple.com/source/Security/Security-59306.11.20/OSX/authd/authorization.plist.auto.html). The rules allow for very granular control over what privilege a client needs to have in order to qualify for a rule. They include but are not limited to the client's group, the client's user, whether it's running as GUI or console and the client's entitlements. Some rights additionally or alternatively require the user to enter their password into a pop-up dialog. If you're a MacOS user I'm sure you've seen similar pop-ups before ;)
+The set of supported rules as well as some preregistered rights are defined in the [authorization.plist](https://opensource.apple.com/source/Security/Security-59306.11.20/OSX/authd/authorization.plist.auto.html). The rules allow for very granular control over which privilege a client needs to have in order to qualify for a rule. They include but are not limited to the client's group, the client's user, whether it's running as GUI or console and the client's entitlements. Some rights additionally or alternatively require the user to enter their password into a pop-up dialog. If you're a MacOS user, I'm sure you've seen similar pop-ups before ;)
 
 ![_config.yml]({{ site.baseurl }}/images/unauthd_Logic_bugs_FTW/authd_popup.png)
 
 While auditing the `authd` code I found something interesting in [process.c](https://opensource.apple.com/source/Security/Security-59306.11.20/OSX/authd/process.c.auto.html).
-Specifically the part responsible for fetching code signing related information from a client: 
+Specifically, the lines of Code responsible for fetching code signing related information from a client: 
 
 ```c
     // ...
@@ -124,7 +124,7 @@ With this knowledge, triggering the bug is very straight forward:
 In case you're wondering why we can't just do the codesigning first, before even running the program, it's because of the AppleMobileFileIntegretyDaemon or `amfid(8)`. This is the daemon responsible for fetching and verifying entitlements/signatures of signed binaries. `amfid` wouldn't allow us to run since we're a non Apple signed program with restricted entitlements.
 
 This would be an awesome primitive, if we could get any right we wanted just by holding the proper entitlement, in which case we could just get the `system.privilege.admin` right and use the `AuthorizationExecuteWithPrivileges` API to get root privileges, however that's not the case. 
-As mentioned earlier, a process needs to satisfy the rules in order to obtain a right. One of these rules (mostly used by Apple's private frameworks) checks the entitlements however many rules don't care about the entitlements. Instead they require the client to run as a specific user or the user to enter a password. 
+As mentioned earlier, a process needs to satisfy the rules in order to obtain a right. One of these rules (mostly used by Apple's private frameworks) checks the entitlements, however many rules don't care about the entitlements. Instead they require the client to run as a specific user or the user to enter a password. 
 
 After analyzing the authorization.plist I found the following rights to be obtainable by the default user just by holding the corresponding entitlements: 
 
@@ -159,7 +159,7 @@ Honorable mentions are `com.apple.activitymonitor.kill` which can be used to kil
 
 So we're left with the `system.install.*` rights. Reversing the private `PackageKit.framework` revealed that it has some interesing APIs. They can be used to install Apple signed packages to any non-SIP protected location. That'll get useful when we get to the next vulnerability :P
 
-I'm sure that I've missed some other way to use the rights to get code execution. If you're interested, feel free to do some reversing of your own and please tell me what you found ;).
+I'm sure that I've missed some other way to use the rights to get code execution. If you're interested, feel free to do some reversing of your own and please tell me what you find out ;).
 
 Apple's mitigation for this bug was implementing the code validity checks in `SecCodeCopySigningInformation`, thereby removing the need to call `SecCodeCheckValidity[WithErrors]` beforehand.
 The updated developer documentation states:
