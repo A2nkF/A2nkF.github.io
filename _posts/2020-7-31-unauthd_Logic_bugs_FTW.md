@@ -228,7 +228,9 @@ February 24th 2020: First working Exploit
 
 February 28th 2020: Reported Vulnerabilies to Apple
 
-July 24th 2020: Apple released public patch
+July 24th 2020: Apple released public patch for macOS (10.15.6)
+
+July 28th 2020: ? Apple released public patch for tvOS (13.4.5)
 
 July 31st 2020: Public Disclosure
 
