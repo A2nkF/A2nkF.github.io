@@ -7,7 +7,7 @@ title: Unauthd - Logic bugs FTW
 
 Hi! I'm Ilias aka A2nkF, an independent security researcher from Germany.
 
-This blog post is about a MacOS LPE chain I wrote and reported back in Februray. It features three logic bugs to go from user to root with System Integrety Protection (SIP) bypass to kernel. Since I'm not exploiting any memory corruptions or other vulnerabilites that aren't 100% deterministic, this chain is fully reliable which I think is cool ;). It runs on MacOS <= 10.15.5
+This blog post is about a MacOS LPE chain I wrote and reported back in Februray. It features three logic bugs to go from user to root with System Integrety Protection (SIP) bypass to kernel. Since I'm not exploiting any memory corruptions or other vulnerabilites that aren't 100% deterministic, this chain is fully reliable which I think is cool ;). It runs on MacOS < 10.15.5
 This was my first real life exploit chain so I probably made a ton of mistakes. If you spot any or have any suggestions/improvments, please DM me on [twitter](https://twitter.com/A2nkF_) or create a pull request/issue. 
 
 
